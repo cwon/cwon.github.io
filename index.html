@@ -20,6 +20,7 @@
 var voices = [];
 function setVoiceList() {
     combo = document.getElementById("combo")
+    removeOptions(combo)
     voices = window.speechSynthesis.getVoices();
     console.log(voices)
     for (let index = 0; index < voices.length; index++) {
@@ -94,6 +95,13 @@ function work()
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function removeOptions(selectElement) {
+   var i, L = selectElement.options.length - 1;
+   for(i = L; i >= 0; i--) {
+      selectElement.remove(i);
+   }
 }
 
 </script>
