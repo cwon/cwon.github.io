@@ -13,6 +13,8 @@
 <input type="number" id="rate" name="rate" value=0.8>
 <label for="quantity">언어 선택</label>
 <select name="combo" id="combo"></select>
+<label for="quantity">랜덤 재생</label>
+<input type="checkbox" id="randcheck">
 
 <p><textarea id="words" cols="50" rows="100" autocomplete="off"></textarea></p>
 
@@ -90,6 +92,10 @@ function work()
     words = document.getElementById("words").value
     words = words.split("\n")    
     console.log(words)
+    if(document.getElementById("randcheck").checked) {
+        words = shuffle(words)
+
+    }
     speech(words);    
 }
 
@@ -102,6 +108,14 @@ function removeOptions(selectElement) {
    for(i = L; i >= 0; i--) {
       selectElement.remove(i);
    }
+}
+
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
 }
 
 </script>
