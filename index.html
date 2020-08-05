@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>CSS Template</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<input type="button" value="말하기" onclick="work()"/>
+<label for="quantity">단어 사이 간격(초)</label>
+<input type="number" id="quantity" name="quantity" min="1" value=2>
+<label for="quantity">단어 발음 속도</label>
+<input type="number" id="rate" name="rate" value=0.8>
+<label for="quantity">언어 선택</label>
+<select name="combo" id="combo"></select>
+
+<p><textarea id="words" cols="50" rows="100" autocomplete="off"></textarea></p>
+
+<script>
+var voices = [];
+function setVoiceList() {
+    combo = document.getElementById("combo")
+    voices = window.speechSynthesis.getVoices();
+    console.log(voices)
+    for (let index = 0; index < voices.length; index++) {
+        const element = voices[index];
+        var option = document.createElement("option");
+        option.text = element.name;
+        option.value = element.lang;
+        try {
+            combo.add(option, null); //Standard
+        }catch(error) {
+            combo.add(option); // IE only
+        }       
+    }
+    combo.value = "en-US"
+
+}
+setVoiceList();
+
+if (window.speechSynthesis.onvoiceschanged !== undefined) {
+window.speechSynthesis.onvoiceschanged = setVoiceList;
+}
+
+async function speech(txt) 
+{
+    if(!window.speechSynthesis) {
+        alert("음성 재생을 지원하지 않는 브라우저입니다. 크롬, 파이어폭스 등의 최신 브라우저를 이용하세요");
+        return;
+    }
+    //var lang = 'ko-KR';
+    var lang = document.getElementById("combo").value
+    for (let index = 0; index < txt.length; index++) {
+        const element = txt[index];
+        if (element.length == 0) {
+            continue
+        }
+        var utterThis = new SpeechSynthesisUtterance(element);
+        utterThis.onend = function (event) {
+            console.log('end');
+        };
+        utterThis.onerror = function(event) {
+            console.log('error', event);
+        };
+        
+        var voiceFound = false;
+        for(var i = 0; i < voices.length ; i++) 
+        {
+            if(voices[i].lang.indexOf(lang) >= 0 || voices[i].lang.indexOf(lang.replace('-', '_')) >= 0) {
+                utterThis.voice = voices[i];
+                voiceFound = true;
+            }
+        }
+        if(!voiceFound) {
+            alert('voice not found');
+            return;
+        }
+        utterThis.lang = lang;
+        utterThis.pitch = 1;
+        utterThis.rate = parseFloat(document.getElementById("rate").value) //속도
+        window.speechSynthesis.speak(utterThis);        
+        await sleep(parseInt(document.getElementById("quantity").value)*1000);
+    } 
+}
+
+function work()
+{
+    console.log("click")
+    words = document.getElementById("words").value
+    words = words.split("\n")    
+    console.log(words)
+    speech(words);    
+}
+
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+</script>
+</body>
+</html>
