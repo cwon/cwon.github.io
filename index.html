@@ -24,7 +24,6 @@ function setVoiceList() {
     combo = document.getElementById("combo")
     removeOptions(combo)
     voices = window.speechSynthesis.getVoices();
-    console.log(voices)
     for (let index = 0; index < voices.length; index++) {
         const element = voices[index];
         var option = document.createElement("option");
@@ -51,10 +50,12 @@ async function speech(txt)
         alert("음성 재생을 지원하지 않는 브라우저입니다. 크롬, 파이어폭스 등의 최신 브라우저를 이용하세요");
         return;
     }
+
+    window.speechSynthesis.cancel();
     //var lang = 'ko-KR';
     var lang = document.getElementById("combo").value
     for (let index = 0; index < txt.length; index++) {
-        const element = txt[index];
+        const element = txt[index].trim();
         if (element.length == 0) {
             continue
         }
@@ -88,10 +89,8 @@ async function speech(txt)
 
 function work()
 {
-    console.log("click")
     words = document.getElementById("words").value
     words = words.split("\n")    
-    console.log(words)
     if(document.getElementById("randcheck").checked) {
         words = shuffle(words)
 
