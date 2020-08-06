@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<input type="button" value="말하기" onclick="work()"/>
+<input type="button" id="speechBtn" value="말하기" onclick="work()"/>
 <label for="quantity">단어 사이 간격(초)</label>
 <input type="number" id="quantity" name="quantity" min="1" value=2>
 <label for="quantity">단어 발음 속도</label>
@@ -52,12 +52,12 @@ async function speech(txt)
     }
 
     window.speechSynthesis.cancel();
-    //var lang = 'ko-KR';
+ 
     var lang = document.getElementById("combo").value
     for (let index = 0; index < txt.length; index++) {
-        const element = txt[index].trim();
+        const element = txt[index].trim()
         if (element.length == 0) {
-            continue
+            //continue
         }
         var utterThis = new SpeechSynthesisUtterance(element);
         utterThis.onend = function (event) {
@@ -84,7 +84,10 @@ async function speech(txt)
         utterThis.rate = parseFloat(document.getElementById("rate").value) //속도
         window.speechSynthesis.speak(utterThis);        
         await sleep(parseInt(document.getElementById("quantity").value)*1000);
-    } 
+    }
+    
+    const btn = document.getElementById("speechBtn")
+    btn.disabled = false
 }
 
 function work()
@@ -93,8 +96,9 @@ function work()
     words = words.split("\n")    
     if(document.getElementById("randcheck").checked) {
         words = shuffle(words)
-
     }
+    const btn = document.getElementById("speechBtn")
+    btn.disabled = true;
     speech(words);    
 }
 
