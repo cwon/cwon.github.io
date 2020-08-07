@@ -32,6 +32,7 @@
         <div class="col-sm">
             <input type="button" class="btn btn-outline-primary" id="speechBtn" value="말하기" onclick="work()"/>
             <input type="button" class="btn btn-outline-secondary" id="speechPauseBtn" value="일시정지" disabled=true onclick="pause()"/>
+            <input type="button" class="btn btn-outline-secondary" id="speechStopBtn" value="정지" disabled=true onclick="stop()"/>
         </div>
     </div>
     <div class="row">
@@ -66,6 +67,7 @@
 <script>
 var voices = [];
 var pauseStatus =  false
+var stopFlag =  false
 function setVoiceList() {
     combo = document.getElementById("combo")
     removeOptions(combo)
@@ -103,8 +105,15 @@ async function speech(txt)
     for (let index = 0; index < txt.length; index++) {
         const element = txt[index].trim()
         if (element.length == 0) {
-            //continue
+            continue
         }
+
+        if (stopFlag == true ) {
+            window.speechSynthesis.cancel();
+            stopFlag = false;
+            return 
+        }
+
         var utterThis = new SpeechSynthesisUtterance(element);
         utterThis.onend = function (event) {
             console.log('end');
@@ -133,7 +142,8 @@ async function speech(txt)
         while (pauseStatus == true) {
             await sleep(1)
         }
-        await sleep(parseInt(document.getElementById("quantity").value)*1000);
+
+        await sleep(parseInt(document.getElementById("quantity").value)*1000);        
     }
 
     const speechBtn = document.getElementById("speechBtn")    
@@ -141,6 +151,9 @@ async function speech(txt)
 
     const pauseBtn = document.getElementById("speechPauseBtn")    
     pauseBtn.disabled = true
+
+    const stopBtn = document.getElementById("speechStopBtn")    
+    stopBtn.disabled = true      
 }
 
 function work()
@@ -153,6 +166,10 @@ function work()
 
         const pauseBtn = document.getElementById("speechPauseBtn")    
         pauseBtn.disabled = false
+
+        const stopBtn = document.getElementById("speechStopBtn")    
+        stopBtn.disabled = false
+
         return;        
     }
 
@@ -167,6 +184,10 @@ function work()
     const pauseBtn = document.getElementById("speechPauseBtn")    
     pauseBtn.disabled = false
 
+    const stopBtn = document.getElementById("speechStopBtn")    
+    stopBtn.disabled = false       
+
+
     speech(words);    
 }
 
@@ -178,9 +199,27 @@ function pause()
         const pauseBtn = document.getElementById("speechPauseBtn")    
         pauseBtn.disabled = true    
 
+        const stopBtn = document.getElementById("speechStopBtn")    
+        stopBtn.disabled = true
+
         const btn = document.getElementById("speechBtn")        
-        btn.disabled = false;        
+        btn.disabled = false;           
     }
+
+}
+
+function stop() {
+
+    const stopBtn = document.getElementById("speechStopBtn")    
+    stopBtn.disabled = true       
+
+    const pauseBtn = document.getElementById("speechPauseBtn")    
+    pauseBtn.disabled = true    
+
+    const btn = document.getElementById("speechBtn")        
+    btn.disabled = false;  
+
+    stopFlag = true;
 
 }
 
