@@ -5,10 +5,10 @@
   <body>
   <script type="text/javascript">
     function setup() {
-    	window.addEventListener('message', messageHandler);
     	function messageHandler(event) {
 	      alert(event.data);
-  	}
+  	} 
+    	window.addEventListener('message', messageHandler);
     }	  
    window.onload = setup;
   </script>
