@@ -30,21 +30,21 @@
     <form>
     <div class="row">
         <div class="col-sm">
-            <input type="button" class="btn btn-outline-primary" id="speechBtn" value="말하기" onclick="work()"/>
-            <input type="button" class="btn btn-outline-secondary" id="speechPauseBtn" value="일시정지" disabled=true onclick="pause()"/>
-            <input type="button" class="btn btn-outline-secondary" id="speechStopBtn" value="정지" disabled=true onclick="stop()"/>
+            <input type="button" class="btn btn-outline-primary" id="speechBtn" value="Speak" onclick="work()"/>
+            <input type="button" class="btn btn-outline-secondary" id="speechPauseBtn" value="Pause" disabled=true onclick="pause()"/>
+            <input type="button" class="btn btn-outline-secondary" id="speechStopBtn" value="Stop" disabled=true onclick="stop()"/>
         </div>
     </div>
     <div class="row">
         <div class="col-sm">
             <div class="form-group">
-                <label for="quantity">단어 사이 간격(초)</label>
+                <label for="quantity">Interval(Sec)</label>
                 <input type="number" class="form-control" id="quantity" name="quantity" min="1" value=2>
             </div>
         </div>
         <div class="col-sm">
             <div class="form-group">
-                <label for="rate">단어 발음 속도</label>
+                <label for="rate">Speech rate</label>
                 <input type="number" class="form-control" id="rate" name="rate" value=0.8>
             </div>
         </div>
@@ -52,14 +52,14 @@
     <div class="row">
         <div class="col-sm">
             <div class="form-group">
-                <label for="combo">언어 선택</label>
+                <label for="combo">Language</label>
                 <select name="combo" class="form-control" id="combo"></select>
             </div>        
         </div>
     </div>
     <div class="form-check">
         <input class="form-check-input" type="checkbox" value="" id="randcheck">
-        <label class="form-check-label" for="defaultCheck1">랜덤 재생</label>
+        <label class="form-check-label" for="defaultCheck1">Random Play</label>
     </div>
 <p><textarea id="words" cols="50" rows="100" autocomplete="off"></textarea></p>
 </form>
@@ -95,7 +95,7 @@ window.speechSynthesis.onvoiceschanged = setVoiceList;
 async function speech(txt) 
 {
     if(!window.speechSynthesis) {
-        alert("음성 재생을 지원하지 않는 브라우저입니다. 크롬, 파이어폭스 등의 최신 브라우저를 이용하세요");
+        alert("Not support browser");
         return;
     }
 
