@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+  <div id="msgList">
+  </div>	  
+	  
+	  
+  <script type="text/javascript">
+    function setup() {
+    	function messageHandler(event) {
+		var para = document.createElement("p");
+		var node = document.createTextNode(event.data);
+		para.appendChild(node);	
+		
+		var element = document.getElementById("msgList");
+		element.appendChild(para);		
+  	} 
+    	window.addEventListener('message', messageHandler);
+    }	  
+   window.onload = setup;
+  </script>
+  </body>
+</html>
