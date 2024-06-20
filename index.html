@@ -4,18 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Svelte App</title>
-    <!-- CSP Header with 'unsafe-eval' and allowing 'livereload' during development -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' http://localhost:35729; style-src 'self' 'unsafe-inline'; connect-src 'self' ws://localhost:35729">
+    <!-- CSP Header adjusted for secure configuration -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self'; 
+        script-src 'self'; 
+        style-src 'self' 'unsafe-inline';
+    ">
 </head>
 <body>
     <script defer src="/build/bundle.js"></script>
-    <!-- Include livereload.js only during development -->
-    <script>
-        if (window.location.hostname === 'localhost') {
-            var script = document.createElement('script');
-            script.src = 'http://localhost:35729/livereload.js?snipver=1';
-            document.head.appendChild(script);
-        }
-    </script>
 </body>
 </html>
