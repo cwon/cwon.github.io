@@ -1,17 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Svelte App</title>
-    <!-- CSP Header adjusted for secure configuration -->
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self'; 
-        script-src 'self'; 
-        style-src 'self' 'unsafe-inline';
-    ">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-174680843-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-174680843-1');
+</script>   
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<title>VOCA SPEECH</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">    
 </head>
 <body>
-    <script defer src="/build/bundle.js"></script>
+<div class="container-fluid">
+    <form>
+    <div class="row">
+        <div class="col-sm">
+            <input type="button" class="btn btn-outline-primary" id="speechBtn" value="Speak" onclick="work()"/>
+            <input type="button" class="btn btn-outline-secondary" id="speechPauseBtn" value="Pause" disabled=true onclick="pause()"/>
+            <input type="button" class="btn btn-outline-secondary" id="speechStopBtn" value="Stop" disabled=true onclick="stop()"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="quantity">Interval(Sec)</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" min="1" value=2>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="rate">Speech rate</label>
+                <input type="number" class="form-control" id="rate" name="rate" value=0.8>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="combo">Language</label>
+                <select name="combo" class="form-control" id="combo"></select>
+            </div>        
+        </div>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="randcheck">
+        <label class="form-check-label" for="defaultCheck1">Random Play</label>
+    </div>
+<p><textarea id="words" cols="50" rows="100" autocomplete="off"></textarea></p>
+</form>
+</div>
+<script>
+var voices = [];
+var pauseStatus =  false
+var stopFlag =  false
+function setVoiceList() {
+    combo = document.getElementById("combo")
+    removeOptions(combo)
+    voices = window.speechSynthesis.getVoices();
+    for (let index = 0; index < voices.length; index++) {
+        const element = voices[index];
+        var option = document.createElement("option");
+        option.text = element.name;
+        option.value = element.lang;
+        try {
+            combo.add(option, null); //Standard
+        }catch(error) {
+            combo.add(option); // IE only
+        }       
+    }
+    combo.value = "en-US"
+
+}
+setVoiceList();
+
+if (window.speechSynthesis.onvoiceschanged !== undefined) {
+window.speechSynthesis.onvoiceschanged = setVoiceList;
+}
+
+async function speech(txt) 
+{
+    if(!window.speechSynthesis) {
+        alert("Not support browser");
+        return;
+    }
+
+    window.speechSynthesis.cancel();
+ 
+    var lang = document.getElementById("combo").value
+    for (let index = 0; index < txt.length; index++) {
+        const element = txt[index].trim()
+        if (element.length == 0) {
+            continue
+        }
+
+        if (stopFlag == true ) {
+            window.speechSynthesis.cancel();
+            stopFlag = false;
+            return 
+        }
+
+        var utterThis = new SpeechSynthesisUtterance(element);
+        utterThis.onend = function (event) {
+            console.log('end');
+        };
+        utterThis.onerror = function(event) {
+            console.log('error', event);
+        };
+        
+        var voiceFound = false;
+        for(var i = 0; i < voices.length ; i++) 
+        {
+            if(voices[i].lang.indexOf(lang) >= 0 || voices[i].lang.indexOf(lang.replace('-', '_')) >= 0) {
+                utterThis.voice = voices[i];
+                voiceFound = true;
+            }
+        }
+        if(!voiceFound) {
+            alert('voice not found');
+            return;
+        }
+        utterThis.lang = lang;
+        utterThis.pitch = 1;
+        utterThis.rate = parseFloat(document.getElementById("rate").value) //속도
+        window.speechSynthesis.speak(utterThis);   
+
+        while (pauseStatus == true) {
+            await sleep(1)
+        }
+
+        await sleep(parseInt(document.getElementById("quantity").value)*1000);        
+    }
+
+    const speechBtn = document.getElementById("speechBtn")    
+    speechBtn.disabled = false
+
+    const pauseBtn = document.getElementById("speechPauseBtn")    
+    pauseBtn.disabled = true
+
+    const stopBtn = document.getElementById("speechStopBtn")    
+    stopBtn.disabled = true      
+}
+
+function work()
+{
+    if (pauseStatus == true) {
+        pauseStatus = false
+
+        const btn = document.getElementById("speechBtn")
+        btn.disabled = true;
+
+        const pauseBtn = document.getElementById("speechPauseBtn")    
+        pauseBtn.disabled = false
+
+        const stopBtn = document.getElementById("speechStopBtn")    
+        stopBtn.disabled = false
+
+        return;        
+    }
+
+    words = document.getElementById("words").value
+    words = words.split("\n")    
+    if(document.getElementById("randcheck").checked) {
+        words = shuffle(words)
+    }
+    const btn = document.getElementById("speechBtn")
+    btn.disabled = true;
+
+    const pauseBtn = document.getElementById("speechPauseBtn")    
+    pauseBtn.disabled = false
+
+    const stopBtn = document.getElementById("speechStopBtn")    
+    stopBtn.disabled = false       
+
+
+    speech(words);    
+}
+
+function pause()
+{
+    if (pauseStatus == false) {
+        pauseStatus = true;
+
+        const pauseBtn = document.getElementById("speechPauseBtn")    
+        pauseBtn.disabled = true    
+
+        const stopBtn = document.getElementById("speechStopBtn")    
+        stopBtn.disabled = true
+
+        const btn = document.getElementById("speechBtn")        
+        btn.disabled = false;           
+    }
+
+}
+
+function stop() {
+
+    const stopBtn = document.getElementById("speechStopBtn")    
+    stopBtn.disabled = true       
+
+    const pauseBtn = document.getElementById("speechPauseBtn")    
+    pauseBtn.disabled = true    
+
+    const btn = document.getElementById("speechBtn")        
+    btn.disabled = false;  
+
+    stopFlag = true;
+
+}
+
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function removeOptions(selectElement) {
+   var i, L = selectElement.options.length - 1;
+   for(i = L; i >= 0; i--) {
+      selectElement.remove(i);
+   }
+}
+
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+</script>
 </body>
 </html>
